@@ -1,17 +1,34 @@
-Fluxograma.Arquiterura-S3-e-Lambda
+# Fluxograma: Arquitetura S3 e Lambda 🏥💻
 
-Os pacientes (usuários) solicitam os exames, porém, cada um com uma data em especifico
-Exame foi guardado no S3 em classes de Storages distintas
-um dos exames possui 2 meses de que foi criado, eventualmente foi para o Storage Standart (acesso rápido) já o outro exame tem 1 anos que foi criado, esse foi para outro Storage, o Glacier.
+## Cenário
+Os pacientes (usuários) solicitam exames, cada um com uma data específica.  
+Esses exames foram guardados no **Amazon S3**, mas em **classes de Storage diferentes**:
 
-Fluxo basico:
-Pacientes solicitam o exame
-o pedido chega no API Gateway, ele recebe essa solicitação, envia para o Lambda, o Lambda pergunta para o S3 “onde esses exames estão armazenados?”
+- 📂 Exame com **2 meses** → está em **Standard** (acesso rápido).  
+- 📂 Exame com **1 ano** → foi movido para **Glacier** (precisa de restauração).  
 
-Os dados mais recentes foram para o Standart, o lambda pega o link e da ao paciente. 
-Os dados mais antigos foram para o Glacier, o Lambad informa “preciso descongelar o arquivo, por favor retorne mais tarde”
+---
 
-API Gateway é utilizado para o paciente mandar o pedido
-Lambda decide se entrega o pedido ou inica o descongelamento dos dados solicitados.
-S3 é onde os dados são guardados em suas classes de Storage
-Email serve para o paciente ser informado que o exame dele vai ser enviado dentro de X período de tempo.
+## Fluxo Básico
+1. 🧑‍⚕️ **Paciente solicita o exame**.  
+2. 📬 O pedido chega no **API Gateway**.  
+3. ⚙️ O **Lambda** recebe a solicitação e pergunta ao **S3**:  
+   > "Onde esse exame está armazenado?"  
+4. 🔍 Decisão:
+   - Se o exame está em **Standard** → Lambda gera o link e entrega direto ao paciente.  
+   - Se o exame está em **Glacier** → Lambda responde:  
+     > "Preciso descongelar o arquivo, por favor retorne mais tarde."  
+
+---
+
+## Componentes da Arquitetura
+- **API Gateway** → porta de entrada para o paciente enviar o pedido.  
+- **Lambda** → decide se entrega o exame ou inicia o processo de restauração.  
+- **Amazon S3** → guarda os exames em diferentes classes de Storage.  
+- **Email/Notificação** → informa o paciente quando o exame estará pronto para download.  
+
+---
+
+## Analogia Hospitalar 🏥
+- **Standard** = exame guardado no balcão → entrega imediata.  
+- **Glacier** = exame guardado no porão, dentro de um freezer → precisa descongelar antes.  
